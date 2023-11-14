@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert, TextInput } from "react-native";
 import { Camera, getSupportedRatiosAsync } from "expo-camera";
 import {
   GestureHandlerRootView,
   PinchGestureHandler,
 } from "react-native-gesture-handler";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
-import Constants from 'expo-constants'
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
   const [socket, setSocket] = useState(null);
+  const [webSocketURL, setWebSocketURL] = useState('')
 
   const cameraRef = useRef(null);
 
@@ -20,16 +20,18 @@ export default function App() {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
     })();
-    const { EXPO_PUBLIC_WEBSOCKET_URL } = Constants.expoConfig.extra
+  }, []);
 
-    let url = EXPO_PUBLIC_WEBSOCKET_URL || process.env.EXPO_PUBLIC_WEBSOCKET_URL
-    console.log(process.env.EXPO_PUBLIC_WEBSOCKET_URL);
-    alert(`ws://${url}/ws/1`)
+  const initializeWebSocket = () => {
+    Alert.alert(webSocketURL)
     const ws = new WebSocket(
-      `ws://${url}/ws/1`,
+      `ws://${webSocketURL}/ws/1`,
     ); // Replace with your WebSocket server URL
     setSocket(ws);
 
+    ws.onopen = () => {
+      Alert.alert('webSocketURL connected!')
+    };
     // Listen for messages
     ws.onmessage = (event) => {
       const message = event.data;
@@ -46,11 +48,8 @@ export default function App() {
     ws.onerror = () => {
       console.log("<p>Error in WebSocket connection</p>");
     };
+  }
 
-    return () => {
-      ws.close();
-    };
-  }, []);
 
   const handleCapture = async () => {
     if (cameraRef.current) {
@@ -74,10 +73,11 @@ export default function App() {
   };
 
   const handleZoom = (event) => {
-    // Handle pinch gesture for zooming
+    // Handle pinch gesture for zoomingprompt
     // You can customize this based on your requirements
     // Check the event.nativeEvent.scale for pinch scale value
   };
+
 
   if (hasPermission === null) {
     return <View />;
@@ -88,6 +88,13 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={{ padding: 10, marginTop: 30 }}>
+        <TextInput onChangeText={url => { setWebSocketURL(url) }}></TextInput>
+        <TouchableOpacity onPress={() => initializeWebSocket()}>
+          <Text style={{ color: 'black' }}>Change WebSocket URL</Text>
+        </TouchableOpacity>
+      </View>
+
       <Camera style={{ flex: 1 }} type={cameraType} ref={cameraRef}>
         <PinchGestureHandler onGestureEvent={handleZoom}>
           <View
