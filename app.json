@@ -24,12 +24,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "EXPO_PUBLIC_WEBSOCKET_URL": "lined-sims-gem-interested.trycloudflare.com",
-      "eas": {
-        "projectId": "96c91cec-aad2-48ac-9913-201afba7ef41"
-      }
     }
   }
 }

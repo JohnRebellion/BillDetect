@@ -11,7 +11,7 @@ export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
   const [socket, setSocket] = useState(null);
-  const [webSocketURL, setWebSocketURL] = useState('')
+  const [webSocketURL, setWebSocketURL] = useState('localhost:8000')
 
   const cameraRef = useRef(null);
 
@@ -19,6 +19,7 @@ export default function App() {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
+      initializeWebSocket()
     })();
   }, []);
 
@@ -88,12 +89,12 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={{ padding: 10, marginTop: 30 }}>
+      {/* <View style={{ padding: 10, marginTop: 30 }}>
         <TextInput onChangeText={url => { setWebSocketURL(url) }}></TextInput>
         <TouchableOpacity onPress={() => initializeWebSocket()}>
           <Text style={{ color: 'black' }}>Change WebSocket URL</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <Camera style={{ flex: 1 }} type={cameraType} ref={cameraRef}>
         <PinchGestureHandler onGestureEvent={handleZoom}>
