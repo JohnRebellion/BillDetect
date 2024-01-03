@@ -1,9 +1,6 @@
 {
   "build": {
     "preview": {
-      "env": {
-        "EXPO_PUBLIC_WEBSOCKET_URL": "leslie-overview-young-perceived.trycloudflare.com"
-      },
       "android": {
         "buildType": "apk"
       }
