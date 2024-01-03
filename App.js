@@ -9,8 +9,10 @@ import {
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator"
 import * as Speech from "expo-speech"
 import { LinearGradient } from "expo-linear-gradient"
+import { PropagateLoader } from "react-spinners"
 
 export default function App() {
+  const [loading, setLoading] = useState(false)
   const [hasPermission, setHasPermission] = useState(null)
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.back)
   const [text, setText] = useState()
@@ -61,7 +63,7 @@ export default function App() {
       let formData = new FormData()
       // Assume "photo" is the name of the form field the server expects
       formData.append("image", { uri: localUri, name: filename, type })
-      fetch("http://192.168.0.106:8000/", {
+      fetch("https://levy-cannon-controversial-jones.trycloudflare.com", {
         method: "POST",
         headers: {
           "content-type": "multipart/form-data",
@@ -73,7 +75,7 @@ export default function App() {
           setText(data)
         })
         .finally(() => {
-          setTimeout(() => setText("Touch to scan"), 3000)
+          setTimeout(() => setText("Tap anywhere to start detection"), 3000)
         })
         .catch((err) => {
           console.log(err)
@@ -83,7 +85,7 @@ export default function App() {
 
   const onPanGestureEvent = (event) => {
     setTitleShown(false)
-    setText("Touch to scan")
+    setText("Tap anywhere to start detection")
   }
 
   if (hasPermission === null) {
@@ -104,7 +106,7 @@ export default function App() {
               justifyContent: "center",
               alignItems: "center",
             }}
-            colors={["#0008C3", "#006AB7"]}
+            colors={["#0008C3", "#006AB7", "#89CFF0"]}
           >
             <View
               style={{
@@ -115,16 +117,16 @@ export default function App() {
               }}
             >
               <Text
-                style={{ fontSize: 56, textAlign: "center", color: "white" }}
+                style={{ fontSize: 32, textAlign: "center", color: "white" }}
               >
                 Fake Money Detector
               </Text>
               <Text
                 style={{
-                  fontSize: 24,
+                  fontSize: 16,
                   textAlign: "center",
                   color: "white",
-                  bottom: 10,
+                  bottom: 80,
                   position: "absolute",
                 }}
               >
@@ -141,6 +143,10 @@ export default function App() {
               }}
             >
               <TouchableOpacity onPress={handleCapture}>
+                {
+                  loading ?
+                    <PropagateLoader color="white" loading={loading} css={override} size={100} />
+                    :
                 <View
                   style={{
                     height: 999,
@@ -151,8 +157,10 @@ export default function App() {
                     backgroundColor: "transparent",
                   }}
                 >
-                  <Text style={{ fontSize: 30, color: "white" }}>{text}</Text>
+                
+                  <Text style={{ fontSize: 20, color: "white" }}>{text}</Text>
                 </View>
+                }
               </TouchableOpacity>
             </View>
           </Camera>
