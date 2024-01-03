@@ -21,7 +21,7 @@ export default function App() {
   const cameraRef = useRef(null)
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync()
       setHasPermission(status === "granted")
 
@@ -42,7 +42,10 @@ export default function App() {
   }, [text])
 
   const handleCapture = async () => {
+    Speech.stop()
+    if (loading) return
     if (cameraRef.current) {
+      setLoading(true)
       setText("Scanning...")
       let photo = await cameraRef.current.takePictureAsync({
         type: "png",
@@ -63,7 +66,7 @@ export default function App() {
       let formData = new FormData()
       // Assume "photo" is the name of the form field the server expects
       formData.append("image", { uri: localUri, name: filename, type })
-      fetch("https://levy-cannon-controversial-jones.trycloudflare.com", {
+      fetch("https://mnv2.onrender.com", {
         method: "POST",
         headers: {
           "content-type": "multipart/form-data",
@@ -72,10 +75,12 @@ export default function App() {
       })
         .then((res) => res.text())
         .then((data) => {
-          setText(data)
+          setLoading(false)
+          let result = data.replace("\rloading Roboflow workspace...\n\rloading Roboflow project...\n", "")
+          setText(result)
         })
         .finally(() => {
-          setTimeout(() => setText("Tap anywhere to start detection"), 3000)
+          setTimeout(() => { setTimeout(() => setLoading(false), 500); setText("Tap anywhere to start detection") }, 2000)
         })
         .catch((err) => {
           console.log(err)
@@ -84,15 +89,34 @@ export default function App() {
   }
 
   const onPanGestureEvent = (event) => {
-    setTitleShown(false)
-    setText("Tap anywhere to start detection")
-  }
+    Speech.stop()
+    const { translationX: x, translationY: y } = event.nativeEvent
+    console.log(`x: ${x}, y: ${y}`)
 
-  if (hasPermission === null) {
-    return <View />
-  }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>
+    if (Math.abs(x) > 50 || Math.abs(y) > 50) {
+      if (y < -100 && Math.abs(x) < 100) {
+        setTitleShown(false)
+        setText("Tap anywhere to start detection")
+        return
+      }
+
+      if (x < 0 && x < 100 && Math.abs(y) < 100) {
+        setText("Left")
+        return
+      }
+
+      if (x > 0 && x > 100 && Math.abs(y) < 100) {
+        setText("Right")
+        return
+      }
+
+      if (hasPermission === null) {
+        return <View />
+      }
+      if (hasPermission === false) {
+        return <Text>No access to camera</Text>
+      }
+    }
   }
 
   return (
@@ -144,22 +168,19 @@ export default function App() {
             >
               <TouchableOpacity onPress={handleCapture}>
                 {
-                  loading ?
-                    <PropagateLoader color="white" loading={loading} css={override} size={100} />
-                    :
-                <View
-                  style={{
-                    height: 999,
-                    width: 999,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "transparent",
-                  }}
-                >
-                
-                  <Text style={{ fontSize: 20, color: "white" }}>{text}</Text>
-                </View>
+                  <View
+                    style={{
+                      height: 999,
+                      width: 999,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "transparent",
+                    }}
+                  >
+
+                    <Text style={{ fontSize: 20, color: "white" }}>{text}</Text>
+                  </View>
                 }
               </TouchableOpacity>
             </View>
