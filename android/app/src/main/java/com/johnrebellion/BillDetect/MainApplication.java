@@ -1,4 +1,4 @@
-package com.johnrebellion.StickerSmash;
+package com.johnrebellion.BillDetect;
 
 import android.app.Application;
 import android.content.res.Configuration;
