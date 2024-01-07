@@ -66,6 +66,7 @@ export default function App() {
       let formData = new FormData()
       // Assume "photo" is the name of the form field the server expects
       formData.append("image", { uri: localUri, name: filename, type })
+      // fetch("http://192.168.0.253:8000", {
       fetch("https://mnv2.onrender.com", {
         method: "POST",
         headers: {
