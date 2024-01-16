@@ -16,7 +16,7 @@ export default function App() {
   const [hasPermission, setHasPermission] = useState(null)
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.back)
   const [text, setText] = useState()
-  const [titleShown, setTitleShown] = useState(true)
+  const [pageShown, setPageShown] = useState("title")
 
   const cameraRef = useRef(null)
 
@@ -96,18 +96,20 @@ export default function App() {
 
     if (Math.abs(x) > 50 || Math.abs(y) > 50) {
       if (y < -100 && Math.abs(x) < 100) {
-        setTitleShown(false)
+        setPageShown("")
         setText("Tap anywhere to start detection")
         return
       }
 
       if (x < 0 && x < 100 && Math.abs(y) < 100) {
-        setText("Left")
+        setPageShown("howToUse")
+        Speech.speak("swipe up")
         return
       }
 
       if (x > 0 && x > 100 && Math.abs(y) < 100) {
-        setText("Right")
+        setPageShown("aboutUs")
+        Speech.speak("swipe up")
         return
       }
 
@@ -123,7 +125,7 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PanGestureHandler onGestureEvent={onPanGestureEvent}>
-        {titleShown ? (
+        {pageShown==='title' ? (
           <LinearGradient
             style={{
               flex: 1,
@@ -159,7 +161,55 @@ export default function App() {
               </Text>
             </View>
           </LinearGradient>
-        ) : (
+        ): pageShown==='howToUse' ? 
+        <LinearGradient
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          colors={["#0008C3", "#006AB7", "#89CFF0"]}
+        >
+          <View
+            style={{
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ fontSize: 32, textAlign: "center", color: "white" }}
+            >
+              How to use
+            </Text>
+          </View>
+        </LinearGradient> :pageShown==='aboutUs' ? 
+        <LinearGradient
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          colors={["#0008C3", "#006AB7", "#89CFF0"]}
+        >
+          <View
+            style={{
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ fontSize: 32, textAlign: "center", color: "white" }}
+            >
+              About us
+            </Text>
+          </View>
+        </LinearGradient> : (
           <Camera style={{ flex: 1 }} type={cameraType} ref={cameraRef}>
             <View
               style={{
